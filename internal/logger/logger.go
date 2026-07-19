@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/amin/product-service/internal/config"
+	"product/internal/config"
 )
 
 func New(cfg config.LoggerConfig) *slog.Logger {
