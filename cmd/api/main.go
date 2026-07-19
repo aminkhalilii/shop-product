@@ -37,6 +37,8 @@ func main() {
 
 	defer db.Close()
 
+	log.Info("database connected")
+
 	log.Info(
 		"service started",
 		slog.String("service", cfg.App.Name),
