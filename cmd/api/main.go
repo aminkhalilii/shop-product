@@ -3,11 +3,17 @@ package main
 import (
 	"context"
 	"log/slog"
+	"net"
 	"os"
+	"strconv"
 
 	"product/internal/config"
 	"product/internal/database"
+	"product/internal/handler"
 	"product/internal/logger"
+	"product/internal/repository/postgres"
+	"product/internal/router"
+	"product/internal/service"
 )
 
 func main() {
@@ -45,4 +51,25 @@ func main() {
 		slog.String("env", cfg.App.Env),
 		slog.String("version", cfg.App.Version),
 	)
+
+	productRepo := postgres.NewProductRepository(db)
+	productService := service.NewProductService(
+		productRepo,
+	)
+	productHandler := handler.NewProductHandler(
+		productService,
+	)
+	r := router.NewRouter(
+		productHandler,
+	)
+	addr := net.JoinHostPort(
+		cfg.Server.Host,
+		strconv.Itoa(cfg.Server.Port),
+	)
+	err = r.Run(addr)
+
+	if err != nil {
+		panic(err)
+	}
+
 }
