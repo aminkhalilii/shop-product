@@ -1,6 +1,27 @@
+version: "3.9"
+
 services:
+  product:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: product-service
+
+    depends_on:
+      - postgres
+
+    ports:
+      - "8080:8080"
+
+    env_file:
+      - .env
+
+    restart: unless-stopped
+
   postgres:
     image: postgres:17
+
     container_name: product-postgres
 
     environment:
