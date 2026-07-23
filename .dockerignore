@@ -1,0 +1,16 @@
+.git
+.gitignore
+
+.env
+
+bin/
+tmp/
+
+coverage.out
+
+vendor/
+
+.idea/
+.vscode/
+
+*.log
