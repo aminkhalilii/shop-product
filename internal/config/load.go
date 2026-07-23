@@ -29,7 +29,7 @@ func Load() (*Config, error) {
 			Port:            getInt("POSTGRES_PORT"),
 			User:            getString("POSTGRES_USER"),
 			Password:        getString("POSTGRES_PASSWORD"),
-			Database:        getString("POSTGRES_DATABASE"),
+			Database:        getString("POSTGRES_DB"),
 			SSLMode:         getString("POSTGRES_SSLMODE"),
 			MaxOpenConns:    getInt("POSTGRES_MAX_OPEN_CONNS"),
 			MaxIdleConns:    getInt("POSTGRES_MAX_IDLE_CONNS"),
