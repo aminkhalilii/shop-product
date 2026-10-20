@@ -26,6 +26,10 @@ func NewRouter(
 				"",
 				productHandler.GetProducts(),
 			)
+			products.POST(
+				"",
+				productHandler.CreateProduct(),
+			)
 		}
 	}
 

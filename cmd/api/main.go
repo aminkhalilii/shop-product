@@ -62,10 +62,18 @@ func main() {
 	r := router.NewRouter(
 		productHandler,
 	)
+
 	addr := net.JoinHostPort(
 		cfg.Server.Host,
 		strconv.Itoa(cfg.Server.Port),
 	)
+
+	for _, route := range r.Routes() {
+		log.Info("route",
+			slog.String("method", route.Method),
+			slog.String("path", route.Path),
+		)
+	}
 	err = r.Run(addr)
 
 	if err != nil {

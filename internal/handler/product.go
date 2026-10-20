@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"product/internal/dto/request"
 	"product/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -49,5 +50,35 @@ func (h *productHandler) GetProducts() gin.HandlerFunc {
 				"data": products,
 			},
 		)
+	}
+}
+func (h *productHandler) CreateProduct() gin.HandlerFunc {
+
+	return func(c *gin.Context) {
+
+		var req request.CreateProduct
+
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		product, err := h.service.Create(
+			c.Request.Context(),
+			req,
+		)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusCreated, gin.H{
+			"data": product,
+		})
 	}
 }

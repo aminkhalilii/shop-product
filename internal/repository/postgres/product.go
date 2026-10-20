@@ -84,3 +84,39 @@ func (r *ProductRepository) FindAll(
 
 	return products, nil
 }
+
+func (r *ProductRepository) Create(
+	ctx context.Context,
+	product *model.Product,
+) error {
+
+	query := `
+	INSERT INTO products
+	(
+		name,
+		slug,
+		description,
+		price,
+		stock
+	)
+	VALUES
+	(
+		$1,$2,$3,$4,$5
+	)
+	RETURNING id,created_at,updated_at
+	`
+
+	return r.db.QueryRow(
+		ctx,
+		query,
+		product.Name,
+		product.Slug,
+		product.Description,
+		product.Price,
+		product.Stock,
+	).Scan(
+		&product.ID,
+		&product.CreatedAt,
+		&product.UpdatedAt,
+	)
+}

@@ -3,11 +3,16 @@ package service
 import (
 	"context"
 
-	"product/internal/model"
+	"product/internal/dto/request"
+	"product/internal/dto/response"
 )
 
 type ProductService interface {
 	GetProducts(
 		ctx context.Context,
-	) ([]model.Product, error)
+	) ([]response.Product, error)
+	Create(
+		ctx context.Context,
+		req request.CreateProduct,
+	) (*response.Product, error)
 }
