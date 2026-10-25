@@ -30,6 +30,10 @@ func NewRouter(
 				"",
 				productHandler.CreateProduct(),
 			)
+			products.PUT(
+				"/:id",
+				productHandler.UpdateProduct(),
+			)
 		}
 	}
 

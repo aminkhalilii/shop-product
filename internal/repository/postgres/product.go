@@ -2,10 +2,12 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
 	"product/internal/model"
 	"product/internal/repository"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -72,10 +74,7 @@ func (r *ProductRepository) FindAll(
 			return nil, err
 		}
 
-		products = append(
-			products,
-			product,
-		)
+		products = append(products, product)
 	}
 
 	if err := rows.Err(); err != nil {
@@ -83,6 +82,54 @@ func (r *ProductRepository) FindAll(
 	}
 
 	return products, nil
+}
+
+// ✅ جدید
+func (r *ProductRepository) FindByID(
+	ctx context.Context,
+	id int,
+) (*model.Product, error) {
+
+	query := `
+		SELECT
+			id,
+			name,
+			slug,
+			description,
+			price,
+			stock,
+			created_at,
+			updated_at
+		FROM products
+		WHERE id = $1
+		LIMIT 1
+	`
+
+	var product model.Product
+
+	err := r.db.QueryRow(
+		ctx,
+		query,
+		id,
+	).Scan(
+		&product.ID,
+		&product.Name,
+		&product.Slug,
+		&product.Description,
+		&product.Price,
+		&product.Stock,
+		&product.CreatedAt,
+		&product.UpdatedAt,
+	)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, repository.ErrProductNotFound
+		}
+		return nil, err
+	}
+
+	return &product, nil
 }
 
 func (r *ProductRepository) Create(
@@ -119,4 +166,43 @@ func (r *ProductRepository) Create(
 		&product.CreatedAt,
 		&product.UpdatedAt,
 	)
+}
+
+func (r *ProductRepository) Update(
+	ctx context.Context,
+	product *model.Product,
+) error {
+
+	query := `
+		UPDATE products
+		SET
+			name        = $1,
+			slug        = $2,
+			description = $3,
+			price       = $4,
+			stock       = $5,
+			updated_at  = NOW()
+		WHERE id = $6
+		RETURNING updated_at
+	`
+
+	err := r.db.QueryRow(
+		ctx,
+		query,
+		product.Name,
+		product.Slug,
+		product.Description,
+		product.Price,
+		product.Stock,
+		product.ID,
+	).Scan(&product.UpdatedAt)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return repository.ErrProductNotFound // ✅ اصلاح شد
+		}
+		return err
+	}
+
+	return nil
 }

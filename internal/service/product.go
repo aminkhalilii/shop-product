@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"product/internal/dto/request"
 	"product/internal/dto/response"
@@ -14,6 +15,7 @@ type productService struct {
 }
 
 var _ ProductService = (*productService)(nil)
+var ErrProductNotFound = errors.New("product not found")
 
 func NewProductService(
 	repo repository.ProductRepository,
@@ -78,4 +80,45 @@ func toProductResponse(p model.Product) response.Product {
 		CreatedAt:   p.CreatedAt,
 		UpdatedAt:   p.UpdatedAt,
 	}
+}
+func (s *productService) Update(
+	ctx context.Context,
+	id int,
+	req request.UpdateProduct,
+) (*response.Product, error) {
+
+	// 1) پیدا کردن محصول
+	product, err := s.repo.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if product == nil {
+		return nil, ErrProductNotFound
+	}
+
+	// 2) اعمال تغییرات partial
+	if req.Name != nil {
+		product.Name = *req.Name
+	}
+	if req.Slug != nil {
+		product.Slug = *req.Slug
+	}
+	if req.Description != nil {
+		product.Description = req.Description
+	}
+	if req.Price != nil {
+		product.Price = int64(*req.Price)
+	}
+	if req.Stock != nil {
+		product.Stock = *req.Stock
+	}
+
+	// 3) ذخیره
+	if err := s.repo.Update(ctx, product); err != nil {
+		return nil, err
+	}
+
+	// 4) خروجی
+	resp := toProductResponse(*product)
+	return &resp, nil
 }

@@ -15,4 +15,9 @@ type ProductService interface {
 		ctx context.Context,
 		req request.CreateProduct,
 	) (*response.Product, error)
+	Update(
+		ctx context.Context,
+		id int,
+		req request.UpdateProduct,
+	) (*response.Product, error)
 }
