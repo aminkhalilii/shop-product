@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
 	"product/internal/dto/request"
+	"product/internal/repository"
 	"product/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -120,6 +122,38 @@ func (h *productHandler) UpdateProduct() gin.HandlerFunc {
 
 		c.JSON(http.StatusCreated, gin.H{
 			"data": product,
+		})
+	}
+}
+
+func (h *productHandler) DeleteProduct() gin.HandlerFunc {
+
+	return func(c *gin.Context) {
+
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil || id <= 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "invalid product id",
+			})
+			return
+		}
+
+		err = h.service.Delete(c.Request.Context(), id)
+		if err != nil {
+			if errors.Is(err, repository.ErrProductNotFound) {
+				c.JSON(http.StatusNotFound, gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "product deleted successfully",
 		})
 	}
 }

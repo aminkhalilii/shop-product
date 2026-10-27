@@ -25,4 +25,5 @@ type ProductRepository interface {
 		ctx context.Context,
 		product *model.Product,
 	) error
+	Delete(ctx context.Context, id int) error
 }

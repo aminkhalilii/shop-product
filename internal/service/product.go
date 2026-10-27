@@ -122,3 +122,11 @@ func (s *productService) Update(
 	resp := toProductResponse(*product)
 	return &resp, nil
 }
+
+func (s *productService) Delete(
+	ctx context.Context,
+	id int,
+) error {
+
+	return s.repo.Delete(ctx, id)
+}

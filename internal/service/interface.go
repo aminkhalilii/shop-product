@@ -20,4 +20,6 @@ type ProductService interface {
 		id int,
 		req request.UpdateProduct,
 	) (*response.Product, error)
+
+	Delete(ctx context.Context, id int) error
 }

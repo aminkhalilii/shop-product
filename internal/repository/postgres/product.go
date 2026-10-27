@@ -206,3 +206,25 @@ func (r *ProductRepository) Update(
 
 	return nil
 }
+
+func (r *ProductRepository) Delete(
+	ctx context.Context,
+	id int,
+) error {
+
+	query := `
+		DELETE FROM products
+		WHERE id = $1
+	`
+
+	tag, err := r.db.Exec(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	if tag.RowsAffected() == 0 {
+		return repository.ErrProductNotFound
+	}
+
+	return nil
+}

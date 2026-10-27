@@ -34,6 +34,10 @@ func NewRouter(
 				"/:id",
 				productHandler.UpdateProduct(),
 			)
+			products.DELETE(
+				"/:id",
+				productHandler.DeleteProduct(),
+			)
 		}
 	}
 
